@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Expo Dev Server",
+      "runtimeExecutable": "/Users/Daniel/.nvm/versions/node/v24.12.0/bin/node",
+      "runtimeArgs": ["node_modules/expo/bin/cli", "start"],
+      "port": 8081
+    },
+    {
+      "name": "Expo Web",
+      "runtimeExecutable": "/Users/Daniel/.nvm/versions/node/v24.12.0/bin/node",
+      "runtimeArgs": ["node_modules/expo/bin/cli", "start", "--web"],
+      "port": 8081
+    },
+    {
+      "name": "Expo Android",
+      "runtimeExecutable": "/Users/Daniel/.nvm/versions/node/v24.12.0/bin/node",
+      "runtimeArgs": ["node_modules/expo/bin/cli", "start", "--android"],
+      "port": 8081
+    },
+    {
+      "name": "Expo iOS",
+      "runtimeExecutable": "/Users/Daniel/.nvm/versions/node/v24.12.0/bin/node",
+      "runtimeArgs": ["node_modules/expo/bin/cli", "start", "--ios"],
+      "port": 8081
+    }
+  ]
+}
