@@ -24,8 +24,10 @@ function useProtectedRoute() {
     // Dev mode — let the user navigate freely without auth
     if (!isConfigured) return;
 
-    const inAuthGroup = segments[0] === '(auth)';
-    const onOnboarding = segments[1] === 'onboarding';
+    // expo-router types `segments` as a tuple; widen for index access.
+    const segs = segments as unknown as string[];
+    const inAuthGroup = segs[0] === '(auth)';
+    const onOnboarding = segs[1] === 'onboarding';
 
     if (!firebaseUser) {
       // Not logged in → always go to login

@@ -27,6 +27,7 @@ const USERS_COLLECTION = 'users';
  * Throws if the user does not exist.
  */
 export async function getUser(userId: string): Promise<IUser> {
+  if (!db) throw new Error('Firebase not configured');
   const ref = doc(db, USERS_COLLECTION, userId);
   const snap = await getDoc(ref);
 
@@ -41,6 +42,7 @@ export async function getUser(userId: string): Promise<IUser> {
  * Check whether a user profile exists in Firestore.
  */
 export async function userExists(userId: string): Promise<boolean> {
+  if (!db) throw new Error('Firebase not configured');
   const ref = doc(db, USERS_COLLECTION, userId);
   const snap = await getDoc(ref);
   return snap.exists();
@@ -54,6 +56,7 @@ export async function userExists(userId: string): Promise<boolean> {
  * Adds server-generated timestamps for createdAt and lastActive.
  */
 export async function createUser(data: IUserCreate): Promise<void> {
+  if (!db) throw new Error('Firebase not configured');
   const ref = doc(db, USERS_COLLECTION, data.userId);
   await setDoc(ref, {
     ...data,
@@ -73,6 +76,7 @@ export async function updateUser(
   userId: string,
   data: Partial<Omit<IUser, 'userId' | 'createdAt'>>,
 ): Promise<void> {
+  if (!db) throw new Error('Firebase not configured');
   const ref = doc(db, USERS_COLLECTION, userId);
   await updateDoc(ref, {
     ...data,
@@ -87,6 +91,7 @@ export async function updateUser(
  * Note: does NOT delete the Firebase Auth account — that must be done separately.
  */
 export async function deleteUser(userId: string): Promise<void> {
+  if (!db) throw new Error('Firebase not configured');
   const ref = doc(db, USERS_COLLECTION, userId);
   await deleteDoc(ref);
 }
@@ -134,6 +139,7 @@ export async function unblockUser(
 export async function getUsersBySport(
   sport: IUser['sport'],
 ): Promise<IUser[]> {
+  if (!db) throw new Error('Firebase not configured');
   const q = query(
     collection(db, USERS_COLLECTION),
     where('sport', '==', sport),

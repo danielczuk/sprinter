@@ -19,7 +19,7 @@ import {
   ICoords,
   LocationPermissionStatus,
 } from '@/services/geo.service';
-import { useDiscoveryStore } from '@/stores/discovery.store';
+import { useDiscoveryStore, IDiscoveryState } from '@/stores/discovery.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { isConfigured } from '@/services/firebase';
 
@@ -38,13 +38,13 @@ export interface IUseDiscoveryResult {
   permissionStatus: LocationPermissionStatus;
 
   // Re-eksport ze store'a — żeby ekran miał jeden punkt importu
-  users: ReturnType<typeof useDiscoveryStore.getState>['users'];
-  filters: ReturnType<typeof useDiscoveryStore.getState>['filters'];
+  users: IDiscoveryState['users'];
+  filters: IDiscoveryState['filters'];
   isLoading: boolean;
   error: string | null;
 
   // Akcje
-  setFilters: ReturnType<typeof useDiscoveryStore.getState>['setFilters'];
+  setFilters: IDiscoveryState['setFilters'];
   /** Wymuś ponowne pobranie partnerów dla aktualnych coords + filters. */
   refresh: () => Promise<void>;
   /** Zapytaj o uprawnienie GPS (np. po tapnięciu CTA "Włącz lokalizację"). */
