@@ -7,8 +7,10 @@ const mockSetDoc = jest.fn();
 const mockUpdateDoc = jest.fn();
 const mockDeleteDoc = jest.fn();
 const mockGetDocs = jest.fn();
-const mockDoc = jest.fn((_db: unknown, _col: string, id?: string) => ({ id: id ?? 'generated-id' }));
-const mockCollection = jest.fn(() => ({ id: 'activities' }));
+const mockDoc = jest.fn((..._args: unknown[]) => ({
+  id: (_args[2] as string | undefined) ?? 'generated-id',
+}));
+const mockCollection = jest.fn((..._args: unknown[]) => ({ id: 'activities' }));
 const mockQuery = jest.fn();
 const mockWhere = jest.fn();
 const mockOrderBy = jest.fn();

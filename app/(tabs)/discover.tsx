@@ -1,8 +1,8 @@
 // app/(tabs)/discover.tsx
 // Discovery screen — find sport partners nearby.
-// Shows filterable feed of UserCards using the discovery store.
+// Shows filterable feed of UserCards driven by the useDiscovery hook.
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,31 +12,30 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useDiscoveryStore } from '@/stores/discovery.store';
+import { useDiscovery } from '@/hooks/useDiscovery';
 import { SPORT_LIST } from '@/constants/sports';
 import { COLORS, FONT_SIZE, SPACING, RADIUS, LAYOUT } from '@/constants/theme';
 import UserCard from '@/components/ui/UserCard';
 import { IUserWithDistance, SportType } from '@/types';
 
-// ─── WARSAW CENTER (default when no GPS) ─────────────────────────────────────
-const DEFAULT_LAT = 52.2297;
-const DEFAULT_LON = 21.0122;
-
 export default function DiscoverScreen() {
   const router = useRouter();
-  const { users, filters, isLoading, error, setFilters, fetchUsers } =
-    useDiscoveryStore();
-
-  // Fetch users on mount and when filters change
-  useEffect(() => {
-    // TODO: Replace with real user GPS from expo-location
-    fetchUsers(DEFAULT_LAT, DEFAULT_LON);
-  }, [filters.sport, filters.radiusKm, filters.level]);
+  const {
+    users,
+    filters,
+    isLoading,
+    error,
+    setFilters,
+    refresh,
+    permissionStatus,
+    usingFallbackCoords,
+    requestPermission,
+  } = useDiscovery();
 
   const handleUserPress = useCallback(
-    (user: IUserWithDistance) => {
+    (_user: IUserWithDistance) => {
       // TODO: Navigate to activity proposal / negotiation screen
-      // router.push(`/activity/negotiate?partnerId=${user.userId}`);
+      // router.push(`/activity/negotiate?partnerId=${_user.userId}`);
     },
     [router],
   );
@@ -50,6 +49,22 @@ export default function DiscoverScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Location banner — only when we don't have real GPS */}
+      {usingFallbackCoords && (
+        <Pressable
+          style={styles.locationBanner}
+          onPress={
+            permissionStatus === 'denied' ? undefined : requestPermission
+          }
+        >
+          <Text style={styles.locationBannerText}>
+            {permissionStatus === 'denied'
+              ? '📍 Brak dostępu do lokalizacji — pokazuję partnerów z centrum Warszawy. Włącz lokalizację w ustawieniach systemu.'
+              : '📍 Włącz lokalizację, żeby zobaczyć partnerów rzeczywiście w pobliżu.'}
+          </Text>
+        </Pressable>
+      )}
+
       {/* Sport filter chips */}
       <View style={styles.filterBar}>
         <FlatList
@@ -87,10 +102,7 @@ export default function DiscoverScreen() {
       ) : error ? (
         <View style={styles.center}>
           <Text style={styles.errorText}>{error}</Text>
-          <Pressable
-            style={styles.retryButton}
-            onPress={() => fetchUsers(DEFAULT_LAT, DEFAULT_LON)}
-          >
+          <Pressable style={styles.retryButton} onPress={refresh}>
             <Text style={styles.retryText}>Spróbuj ponownie</Text>
           </Pressable>
         </View>
@@ -135,6 +147,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundSecondary,
+  },
+
+  // Location banner
+  locationBanner: {
+    backgroundColor: COLORS.gray100,
+    paddingHorizontal: LAYOUT.screenPaddingH,
+    paddingVertical: SPACING.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.gray200,
+  },
+  locationBannerText: {
+    fontSize: FONT_SIZE.sm,
+    color: COLORS.gray700,
+    lineHeight: FONT_SIZE.sm * 1.4,
   },
 
   // Filter bar

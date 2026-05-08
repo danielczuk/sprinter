@@ -7,8 +7,7 @@ import { create } from 'zustand';
 import { Timestamp, GeoPoint } from 'firebase/firestore';
 import { IUserWithDistance, IDiscoveryFilters, SportType, LevelType } from '@/types';
 import { isConfigured } from '@/services/firebase';
-import { getUsersBySport } from '@/services/users.service';
-import { haversineDistance } from '@/utils/geo.utils';
+import { findNearbyPartners } from '@/services/geo.service';
 import { DEFAULT_RADIUS_KM } from '@/constants/sports';
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
@@ -150,25 +149,18 @@ export const useDiscoveryStore = create<IDiscoveryState>((set, get) => ({
             (!filters.level || u.level === filters.level),
         );
       } else {
-        // PRODUCTION: fetch from Firestore
-        const rawUsers = await getUsersBySport(filters.sport);
+        // PRODUCTION: fetch from Firestore via geo.service.
+        // findNearbyPartners already does bbox + Haversine + sort.
+        usersWithDistance = await findNearbyPartners(currentLat, currentLon, {
+          sport: filters.sport,
+          radiusKm: filters.radiusKm,
+        });
 
-        usersWithDistance = rawUsers
-          .map((u) => ({
-            ...u,
-            distanceKm: haversineDistance(
-              currentLat,
-              currentLon,
-              u.location.latitude,
-              u.location.longitude,
-            ),
-          }))
-          .filter(
-            (u) =>
-              u.distanceKm <= filters.radiusKm &&
-              (!filters.level || u.level === filters.level),
-          )
-          .sort((a, b) => a.distanceKm - b.distanceKm);
+        if (filters.level) {
+          usersWithDistance = usersWithDistance.filter(
+            (u) => u.level === filters.level,
+          );
+        }
       }
 
       set({ users: usersWithDistance, isLoading: false });
