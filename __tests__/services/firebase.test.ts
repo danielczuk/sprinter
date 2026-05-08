@@ -1,5 +1,5 @@
 // __tests__/services/firebase.test.ts
-// Pierwszy test projektu — weryfikuje że Firebase inicjalizuje się poprawnie.
+// Tests for Firebase initialization — both configured and unconfigured states.
 
 jest.mock('firebase/app', () => ({
   initializeApp: jest.fn(() => ({ name: '[DEFAULT]' })),
@@ -15,19 +15,33 @@ jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(() => ({ type: 'firestore' })),
 }));
 
-describe('Firebase initialization', () => {
+describe('Firebase initialization — with config', () => {
   beforeEach(() => {
     jest.resetModules();
+    process.env.EXPO_PUBLIC_FIREBASE_API_KEY = 'test-key';
+    process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID = 'test-project';
   });
 
-  it('eksportuje instancję auth', () => {
+  afterEach(() => {
+    delete process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
+    delete process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
+  });
+
+  it('eksportuje instancję auth gdy config istnieje', () => {
     const { auth } = require('../../services/firebase');
     expect(auth).toBeDefined();
+    expect(auth).not.toBeNull();
   });
 
-  it('eksportuje instancję db (Firestore)', () => {
+  it('eksportuje instancję db (Firestore) gdy config istnieje', () => {
     const { db } = require('../../services/firebase');
     expect(db).toBeDefined();
+    expect(db).not.toBeNull();
+  });
+
+  it('eksportuje isConfigured = true', () => {
+    const { isConfigured } = require('../../services/firebase');
+    expect(isConfigured).toBe(true);
   });
 
   it('nie wywołuje initializeApp ponownie gdy app już istnieje', () => {
@@ -37,5 +51,24 @@ describe('Firebase initialization', () => {
     require('../../services/firebase');
 
     expect(firebaseApp.initializeApp).not.toHaveBeenCalled();
+  });
+});
+
+describe('Firebase initialization — without config', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    delete process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
+    delete process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
+  });
+
+  it('eksportuje null dla auth i db gdy brakuje config', () => {
+    const { auth, db } = require('../../services/firebase');
+    expect(auth).toBeNull();
+    expect(db).toBeNull();
+  });
+
+  it('eksportuje isConfigured = false', () => {
+    const { isConfigured } = require('../../services/firebase');
+    expect(isConfigured).toBe(false);
   });
 });
