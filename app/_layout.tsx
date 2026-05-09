@@ -49,7 +49,7 @@ function useProtectedRoute() {
     if (inAuthGroup) {
       router.replace('/(tabs)/discover');
     }
-  }, [firebaseUser, profile, isInitialized, segments]);
+  }, [firebaseUser, profile, isInitialized, segments, router]);
 }
 
 export default function RootLayout() {
@@ -58,7 +58,7 @@ export default function RootLayout() {
   useEffect(() => {
     const unsubscribe = initialize();
     return unsubscribe;
-  }, []);
+  }, [initialize]);
 
   useProtectedRoute();
 

@@ -45,15 +45,11 @@ function UserCard({ user, onPress }: UserCardProps) {
           <Text style={styles.name} numberOfLines={1}>
             {user.name}
           </Text>
-          <Text style={styles.lastActive}>
-            {formatLastActive(lastActiveDate)}
-          </Text>
+          <Text style={styles.lastActive}>{formatLastActive(lastActiveDate)}</Text>
         </View>
 
         <View style={styles.distanceBadge}>
-          <Text style={styles.distanceText}>
-            {formatDistance(user.distanceKm)}
-          </Text>
+          <Text style={styles.distanceText}>{formatDistance(user.distanceKm)}</Text>
         </View>
       </View>
 
@@ -77,9 +73,7 @@ function UserCard({ user, onPress }: UserCardProps) {
       {/* Stats row */}
       {user.stats && (
         <View style={styles.statsRow}>
-          {user.stats.avgPace ? (
-            <StatItem value={user.stats.avgPace} label="min/km" />
-          ) : null}
+          {user.stats.avgPace ? <StatItem value={user.stats.avgPace} label="min/km" /> : null}
           {user.stats.weeklyKm != null ? (
             <StatItem value={`${user.stats.weeklyKm}`} label="km/tydz." />
           ) : null}

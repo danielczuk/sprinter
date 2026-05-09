@@ -2,6 +2,21 @@
 
 // ─── MOCKS ───────────────────────────────────────────────────────────────────
 
+import type { GeoPoint, Timestamp } from 'firebase/firestore';
+
+import {
+  getActivity,
+  getUserActivities,
+  getUserActivitiesByStatus,
+  createActivity,
+  updateActivityStatus,
+  updateActivityConditions,
+  confirmActivityCompleted,
+  cancelActivity,
+  deleteActivity,
+} from '../../services/activities.service';
+import type { IActivity } from '../../types';
+
 const mockGetDoc = jest.fn();
 const mockSetDoc = jest.fn();
 const mockUpdateDoc = jest.fn();
@@ -35,18 +50,6 @@ jest.mock('../../services/firebase', () => ({
   db: { type: 'firestore' },
 }));
 
-import {
-  getActivity,
-  getUserActivities,
-  getUserActivitiesByStatus,
-  createActivity,
-  updateActivityStatus,
-  updateActivityConditions,
-  confirmActivityCompleted,
-  cancelActivity,
-  deleteActivity,
-} from '../../services/activities.service';
-
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
 const baseActivity = {
@@ -55,23 +58,23 @@ const baseActivity = {
   sport: 'running' as const,
   status: 'proposed' as const,
   conditions: {
-    dateTime: { toMillis: () => 1000 } as any,
+    dateTime: { toMillis: () => 1000 } as unknown as Timestamp,
     locationName: 'Park Łazienkowski',
-    locationGeo: {} as any,
+    locationGeo: {} as unknown as GeoPoint,
     pace: '5:30',
     distance: 10,
   },
   confirmedBy: [],
   chatUnlocked: false,
-  createdAt: { toMillis: () => 2000 } as any,
-  updatedAt: { toMillis: () => 2000 } as any,
+  createdAt: { toMillis: () => 2000 } as unknown as Timestamp,
+  updatedAt: { toMillis: () => 2000 } as unknown as Timestamp,
 };
 
 function makeSnap(exists: boolean, data: Record<string, unknown> = {}, id = 'act1') {
   return { exists: () => exists, id, data: () => data };
 }
 
-function makeDocs(items: Array<{ id: string; data: Record<string, unknown> }>) {
+function makeDocs(items: { id: string; data: Record<string, unknown> }[]) {
   return { docs: items.map(({ id, data }) => makeSnap(true, data, id)) };
 }
 
@@ -154,7 +157,7 @@ describe('updateActivityConditions', () => {
   it('updates conditions and bumps updatedAt', async () => {
     const newConditions = { pace: '5:00', distance: 15 };
 
-    await updateActivityConditions('act1', newConditions as any);
+    await updateActivityConditions('act1', newConditions as Partial<IActivity['conditions']>);
 
     const [, data] = mockUpdateDoc.mock.calls[0];
     expect(data.conditions).toEqual(newConditions);
@@ -177,8 +180,22 @@ describe('getUserActivities', () => {
   it('returns merged and deduplicated activities for a user', async () => {
     // user1 is initiator of act1, partner in act2
     mockGetDocs
-      .mockResolvedValueOnce(makeDocs([{ id: 'act1', data: { ...baseActivity, createdAt: { toMillis: () => 3000 } } }]))
-      .mockResolvedValueOnce(makeDocs([{ id: 'act2', data: { ...baseActivity, initiatorId: 'user3', partnerId: 'user1', createdAt: { toMillis: () => 2000 } } }]));
+      .mockResolvedValueOnce(
+        makeDocs([{ id: 'act1', data: { ...baseActivity, createdAt: { toMillis: () => 3000 } } }])
+      )
+      .mockResolvedValueOnce(
+        makeDocs([
+          {
+            id: 'act2',
+            data: {
+              ...baseActivity,
+              initiatorId: 'user3',
+              partnerId: 'user1',
+              createdAt: { toMillis: () => 2000 },
+            },
+          },
+        ])
+      );
 
     const activities = await getUserActivities('user1');
 
@@ -211,10 +228,12 @@ describe('getUserActivities', () => {
 describe('getUserActivitiesByStatus', () => {
   it('filters by status', async () => {
     mockGetDocs
-      .mockResolvedValueOnce(makeDocs([
-        { id: 'act1', data: { ...baseActivity, status: 'proposed' } },
-        { id: 'act2', data: { ...baseActivity, status: 'confirmed' } },
-      ]))
+      .mockResolvedValueOnce(
+        makeDocs([
+          { id: 'act1', data: { ...baseActivity, status: 'proposed' } },
+          { id: 'act2', data: { ...baseActivity, status: 'confirmed' } },
+        ])
+      )
       .mockResolvedValueOnce(makeDocs([]));
 
     const proposed = await getUserActivitiesByStatus('user1', 'proposed');

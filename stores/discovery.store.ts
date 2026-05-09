@@ -5,7 +5,7 @@
 
 import { create } from 'zustand';
 import { Timestamp, GeoPoint } from 'firebase/firestore';
-import { IUserWithDistance, IDiscoveryFilters, SportType, LevelType } from '@/types';
+import { IUserWithDistance, IDiscoveryFilters } from '@/types';
 import { isConfigured } from '@/services/firebase';
 import { findNearbyPartners } from '@/services/geo.service';
 import { DEFAULT_RADIUS_KM } from '@/constants/sports';
@@ -146,7 +146,7 @@ export const useDiscoveryStore = create<IDiscoveryState>((set, get) => ({
           (u) =>
             u.sport === filters.sport &&
             u.distanceKm <= filters.radiusKm &&
-            (!filters.level || u.level === filters.level),
+            (!filters.level || u.level === filters.level)
         );
       } else {
         // PRODUCTION: fetch from Firestore via geo.service.
@@ -157,16 +157,13 @@ export const useDiscoveryStore = create<IDiscoveryState>((set, get) => ({
         });
 
         if (filters.level) {
-          usersWithDistance = usersWithDistance.filter(
-            (u) => u.level === filters.level,
-          );
+          usersWithDistance = usersWithDistance.filter((u) => u.level === filters.level);
         }
       }
 
       set({ users: usersWithDistance, isLoading: false });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Nie udało się pobrać użytkowników';
+      const message = err instanceof Error ? err.message : 'Nie udało się pobrać użytkowników';
       set({ users: [], isLoading: false, error: message });
     }
   },

@@ -54,8 +54,7 @@ export interface IUseDiscoveryResult {
 // ─── HOOK ────────────────────────────────────────────────────────────────────
 
 export function useDiscovery(): IUseDiscoveryResult {
-  const { users, filters, isLoading, error, setFilters, fetchUsers } =
-    useDiscoveryStore();
+  const { users, filters, isLoading, error, setFilters, fetchUsers } = useDiscoveryStore();
   const profile = useAuthStore((s) => s.profile);
 
   const [coords, setCoords] = useState<ICoords>(DEFAULT_COORDS);
@@ -83,7 +82,7 @@ export function useDiscovery(): IUseDiscoveryResult {
         }
       }
     },
-    [profile?.userId],
+    [profile]
   );
 
   const locate = useCallback(async () => {

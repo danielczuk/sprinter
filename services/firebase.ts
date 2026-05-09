@@ -33,8 +33,8 @@ if (isConfigured) {
 } else {
   console.warn(
     '[Sprinter] Firebase credentials missing. ' +
-    'Create a .env.local file with your Firebase config. ' +
-    'See CLAUDE.md for the required variables.',
+      'Create a .env.local file with your Firebase config. ' +
+      'See CLAUDE.md for the required variables.'
   );
 }
 

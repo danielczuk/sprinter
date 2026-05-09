@@ -3,15 +3,7 @@
 // Shows filterable feed of UserCards driven by the useDiscovery hook.
 
 import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, FlatList, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import { useDiscovery } from '@/hooks/useDiscovery';
 import { SPORT_LIST } from '@/constants/sports';
 import { COLORS, FONT_SIZE, SPACING, RADIUS, LAYOUT } from '@/constants/theme';
@@ -19,7 +11,6 @@ import UserCard from '@/components/ui/UserCard';
 import { IUserWithDistance, SportType } from '@/types';
 
 export default function DiscoverScreen() {
-  const router = useRouter();
   const {
     users,
     filters,
@@ -32,19 +23,16 @@ export default function DiscoverScreen() {
     requestPermission,
   } = useDiscovery();
 
-  const handleUserPress = useCallback(
-    (_user: IUserWithDistance) => {
-      // TODO: Navigate to activity proposal / negotiation screen
-      // router.push(`/activity/negotiate?partnerId=${_user.userId}`);
-    },
-    [router],
-  );
+  const handleUserPress = useCallback((_user: IUserWithDistance) => {
+    // TODO: Navigate to activity proposal / negotiation screen
+    // router.push(`/activity/negotiate?partnerId=${_user.userId}`);
+  }, []);
 
   const handleSportFilter = useCallback(
     (sport: SportType) => {
       setFilters({ sport });
     },
-    [setFilters],
+    [setFilters]
   );
 
   return (
@@ -53,9 +41,7 @@ export default function DiscoverScreen() {
       {usingFallbackCoords && (
         <Pressable
           style={styles.locationBanner}
-          onPress={
-            permissionStatus === 'denied' ? undefined : requestPermission
-          }
+          onPress={permissionStatus === 'denied' ? undefined : requestPermission}
         >
           <Text style={styles.locationBannerText}>
             {permissionStatus === 'denied'
@@ -75,10 +61,7 @@ export default function DiscoverScreen() {
           contentContainerStyle={styles.filterList}
           renderItem={({ item }) => (
             <Pressable
-              style={[
-                styles.filterChip,
-                filters.sport === item.key && styles.filterChipActive,
-              ]}
+              style={[styles.filterChip, filters.sport === item.key && styles.filterChipActive]}
               onPress={() => handleSportFilter(item.key)}
             >
               <Text
@@ -111,8 +94,8 @@ export default function DiscoverScreen() {
           <Text style={styles.emptyEmoji}>🔍</Text>
           <Text style={styles.emptyTitle}>Brak wyników</Text>
           <Text style={styles.emptySubtitle}>
-            Nie znaleziono partnerów w Twojej okolicy.{'\n'}Spróbuj zmienić
-            sport lub zwiększyć zasięg.
+            Nie znaleziono partnerów w Twojej okolicy.{'\n'}Spróbuj zmienić sport lub zwiększyć
+            zasięg.
           </Text>
         </View>
       ) : (
@@ -121,18 +104,11 @@ export default function DiscoverScreen() {
           keyExtractor={(item) => item.userId}
           contentContainerStyle={styles.feed}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <UserCard user={item} onPress={handleUserPress} />
-          )}
+          renderItem={({ item }) => <UserCard user={item} onPress={handleUserPress} />}
           ListHeaderComponent={
             <Text style={styles.resultsCount}>
-              {users.length}{' '}
-              {users.length === 1
-                ? 'osoba'
-                : users.length < 5
-                  ? 'osoby'
-                  : 'osób'}{' '}
-              w pobliżu
+              {users.length} {users.length === 1 ? 'osoba' : users.length < 5 ? 'osoby' : 'osób'} w
+              pobliżu
             </Text>
           }
         />

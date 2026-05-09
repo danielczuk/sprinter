@@ -13,7 +13,6 @@ import {
   where,
   getDocs,
   serverTimestamp,
-  Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { IUser, IUserCreate } from '@/types';
@@ -74,7 +73,7 @@ export async function createUser(data: IUserCreate): Promise<void> {
  */
 export async function updateUser(
   userId: string,
-  data: Partial<Omit<IUser, 'userId' | 'createdAt'>>,
+  data: Partial<Omit<IUser, 'userId' | 'createdAt'>>
 ): Promise<void> {
   if (!db) throw new Error('Firebase not configured');
   const ref = doc(db, USERS_COLLECTION, userId);
@@ -103,10 +102,7 @@ export async function deleteUser(userId: string): Promise<void> {
  * Uses arrayUnion-like logic manually to avoid importing arrayUnion
  * and to keep the blocked list deduplicated.
  */
-export async function blockUser(
-  userId: string,
-  blockedUserId: string,
-): Promise<void> {
+export async function blockUser(userId: string, blockedUserId: string): Promise<void> {
   const user = await getUser(userId);
   const blocked = user.blocked ?? [];
 
@@ -120,10 +116,7 @@ export async function blockUser(
 /**
  * Unblock a user. Removes their userId from the `blocked` array.
  */
-export async function unblockUser(
-  userId: string,
-  blockedUserId: string,
-): Promise<void> {
+export async function unblockUser(userId: string, blockedUserId: string): Promise<void> {
   const user = await getUser(userId);
   const blocked = (user.blocked ?? []).filter((id) => id !== blockedUserId);
 
@@ -136,19 +129,12 @@ export async function unblockUser(
  * Fetch all users practicing a given sport.
  * Used as a starting point before applying geolocation filtering.
  */
-export async function getUsersBySport(
-  sport: IUser['sport'],
-): Promise<IUser[]> {
+export async function getUsersBySport(sport: IUser['sport']): Promise<IUser[]> {
   if (!db) throw new Error('Firebase not configured');
-  const q = query(
-    collection(db, USERS_COLLECTION),
-    where('sport', '==', sport),
-  );
+  const q = query(collection(db, USERS_COLLECTION), where('sport', '==', sport));
   const snapshot = await getDocs(q);
 
-  return snapshot.docs.map(
-    (docSnap) => ({ userId: docSnap.id, ...docSnap.data() }) as IUser,
-  );
+  return snapshot.docs.map((docSnap) => ({ userId: docSnap.id, ...docSnap.data() }) as IUser);
 }
 
 /**
@@ -157,7 +143,7 @@ export async function getUsersBySport(
 export async function updateUserLocation(
   userId: string,
   location: IUser['location'],
-  geohash: string,
+  geohash: string
 ): Promise<void> {
   await updateUser(userId, { location, geohash });
 }

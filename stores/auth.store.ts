@@ -88,8 +88,7 @@ export const useAuthStore = create<IAuthState>((set, get) => ({
       const profile = await getUser(result.user.uid);
       set({ firebaseUser: result.user, profile, isLoading: false });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Błąd logowania';
+      const message = err instanceof Error ? err.message : 'Błąd logowania';
       set({ isLoading: false, error: message });
       throw err;
     }
@@ -102,8 +101,7 @@ export const useAuthStore = create<IAuthState>((set, get) => ({
       await firebaseSignOut(auth);
       set({ firebaseUser: null, profile: null, isLoading: false });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Błąd wylogowania';
+      const message = err instanceof Error ? err.message : 'Błąd wylogowania';
       set({ isLoading: false, error: message });
       throw err;
     }
@@ -117,8 +115,7 @@ export const useAuthStore = create<IAuthState>((set, get) => ({
       const profile = await getUser(firebaseUser.uid);
       set({ profile });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Nie udało się pobrać profilu';
+      const message = err instanceof Error ? err.message : 'Nie udało się pobrać profilu';
       set({ error: message });
     }
   },
@@ -137,8 +134,7 @@ export const useAuthStore = create<IAuthState>((set, get) => ({
       const updated = await getUser(firebaseUser.uid);
       set({ profile: updated, error: null });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Nie udało się zaktualizować profilu';
+      const message = err instanceof Error ? err.message : 'Nie udało się zaktualizować profilu';
       set({ error: message });
       throw err;
     }

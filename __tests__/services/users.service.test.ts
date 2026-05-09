@@ -2,6 +2,21 @@
 
 // ─── MOCKS ───────────────────────────────────────────────────────────────────
 
+import type { GeoPoint } from 'firebase/firestore';
+
+import {
+  getUser,
+  userExists,
+  createUser,
+  updateUser,
+  deleteUser,
+  blockUser,
+  unblockUser,
+  getUsersBySport,
+  updateUserLocation,
+} from '../../services/users.service';
+import type { IUserCreate } from '../../types';
+
 const mockGetDoc = jest.fn();
 const mockSetDoc = jest.fn();
 const mockUpdateDoc = jest.fn();
@@ -30,18 +45,6 @@ jest.mock('firebase/firestore', () => ({
 jest.mock('../../services/firebase', () => ({
   db: {},
 }));
-
-import {
-  getUser,
-  userExists,
-  createUser,
-  updateUser,
-  deleteUser,
-  blockUser,
-  unblockUser,
-  getUsersBySport,
-  updateUserLocation,
-} from '../../services/users.service';
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
@@ -100,7 +103,7 @@ describe('userExists', () => {
 
 describe('createUser', () => {
   it('calls setDoc with user data and server timestamps', async () => {
-    const data = { userId: 'user1', ...mockUserData } as any;
+    const data = { userId: 'user1', ...mockUserData } as unknown as IUserCreate;
 
     await createUser(data);
 
@@ -112,7 +115,11 @@ describe('createUser', () => {
   });
 
   it('defaults blocked to empty array when not provided', async () => {
-    const data = { userId: 'user2', ...mockUserData, blocked: undefined } as any;
+    const data = {
+      userId: 'user2',
+      ...mockUserData,
+      blocked: undefined,
+    } as unknown as IUserCreate;
 
     await createUser(data);
 
@@ -143,9 +150,7 @@ describe('deleteUser', () => {
 
 describe('blockUser', () => {
   it('adds userId to blocked array', async () => {
-    mockGetDoc.mockResolvedValue(
-      makeSnap(true, { ...mockUserData, blocked: [] }, 'user1'),
-    );
+    mockGetDoc.mockResolvedValue(makeSnap(true, { ...mockUserData, blocked: [] }, 'user1'));
 
     await blockUser('user1', 'bully99');
 
@@ -156,7 +161,7 @@ describe('blockUser', () => {
 
   it('does not duplicate if already blocked', async () => {
     mockGetDoc.mockResolvedValue(
-      makeSnap(true, { ...mockUserData, blocked: ['bully99'] }, 'user1'),
+      makeSnap(true, { ...mockUserData, blocked: ['bully99'] }, 'user1')
     );
 
     await blockUser('user1', 'bully99');
@@ -168,7 +173,7 @@ describe('blockUser', () => {
 describe('unblockUser', () => {
   it('removes userId from blocked array', async () => {
     mockGetDoc.mockResolvedValue(
-      makeSnap(true, { ...mockUserData, blocked: ['bully99', 'troll42'] }, 'user1'),
+      makeSnap(true, { ...mockUserData, blocked: ['bully99', 'troll42'] }, 'user1')
     );
 
     await unblockUser('user1', 'bully99');
@@ -207,7 +212,7 @@ describe('updateUserLocation', () => {
   it('updates location and geohash', async () => {
     const fakeGeoPoint = { latitude: 52.23, longitude: 21.01 };
 
-    await updateUserLocation('user1', fakeGeoPoint as any, 'u3qcnhh');
+    await updateUserLocation('user1', fakeGeoPoint as unknown as GeoPoint, 'u3qcnhh');
 
     expect(mockUpdateDoc).toHaveBeenCalledTimes(1);
     const [, docData] = mockUpdateDoc.mock.calls[0];

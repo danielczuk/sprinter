@@ -21,7 +21,7 @@ import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/stores/auth.store';
 import { SPORT_LIST, LEVEL_LIST, MAX_BIO_LENGTH } from '@/constants/sports';
 import { COLORS, FONT_SIZE, SPACING, RADIUS } from '@/constants/theme';
-import { SportType, LevelType } from '@/types';
+import { IUser, SportType, LevelType } from '@/types';
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -39,13 +39,7 @@ const TOTAL_STEPS = 3;
 
 // ─── STEP COMPONENTS ─────────────────────────────────────────────────────────
 
-function StepName({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function StepName({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <View style={step.container}>
       <Text style={step.title}>Jak masz na imię?</Text>
@@ -91,9 +85,7 @@ function StepSport({
             style={[step.chip, sport === s.key && step.chipActive]}
             onPress={() => onSport(s.key)}
           >
-            <Text style={[step.chipText, sport === s.key && step.chipTextActive]}>
-              {s.label}
-            </Text>
+            <Text style={[step.chipText, sport === s.key && step.chipTextActive]}>{s.label}</Text>
           </Pressable>
         ))}
       </View>
@@ -105,9 +97,7 @@ function StepSport({
           style={[step.levelCard, level === l.key && step.levelCardActive]}
           onPress={() => onLevel(l.key)}
         >
-          <Text style={[step.levelLabel, level === l.key && step.levelLabelActive]}>
-            {l.label}
-          </Text>
+          <Text style={[step.levelLabel, level === l.key && step.levelLabelActive]}>{l.label}</Text>
           <Text style={step.levelDesc}>{l.description}</Text>
         </Pressable>
       ))}
@@ -154,9 +144,7 @@ function StepBio({
         {bio.length}/{MAX_BIO_LENGTH}
       </Text>
 
-      <Text style={[step.sectionLabel, { marginTop: SPACING.xl }]}>
-        Statystyki (opcjonalne)
-      </Text>
+      <Text style={[step.sectionLabel, { marginTop: SPACING.xl }]}>Statystyki (opcjonalne)</Text>
 
       {showPace && (
         <View style={step.statRow}>
@@ -259,7 +247,7 @@ export default function OnboardingScreen() {
         },
         // geohash and location will be set when location permission is granted
         geohash: '',
-      } as any);
+      } as Partial<IUser>);
 
       router.replace('/(tabs)/discover');
     } catch {
@@ -278,10 +266,7 @@ export default function OnboardingScreen() {
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
             <View
               key={i}
-              style={[
-                styles.progressSegment,
-                i < step && styles.progressSegmentFilled,
-              ]}
+              style={[styles.progressSegment, i < step && styles.progressSegmentFilled]}
             />
           ))}
         </View>
@@ -292,9 +277,7 @@ export default function OnboardingScreen() {
 
         {/* Step content */}
         <View style={styles.content}>
-          {step === 1 && (
-            <StepName value={form.name} onChange={(v) => updateField('name', v)} />
-          )}
+          {step === 1 && <StepName value={form.name} onChange={(v) => updateField('name', v)} />}
           {step === 2 && (
             <StepSport
               sport={form.sport}
@@ -329,19 +312,12 @@ export default function OnboardingScreen() {
           )}
 
           <Pressable
-            style={[
-              styles.nextButton,
-              (!canProceed() || isLoading) && styles.nextButtonDisabled,
-            ]}
+            style={[styles.nextButton, (!canProceed() || isLoading) && styles.nextButtonDisabled]}
             onPress={handleNext}
             disabled={!canProceed() || isLoading}
           >
             <Text style={styles.nextText}>
-              {step === TOTAL_STEPS
-                ? isLoading
-                  ? 'Zapisywanie...'
-                  : 'Gotowe'
-                : 'Dalej'}
+              {step === TOTAL_STEPS ? (isLoading ? 'Zapisywanie...' : 'Gotowe') : 'Dalej'}
             </Text>
           </Pressable>
         </View>

@@ -4,16 +4,17 @@
 
 // ─── MOCKS ───────────────────────────────────────────────────────────────────
 
+import { renderHook, waitFor, act } from '@testing-library/react-native';
+import { useDiscovery, DEFAULT_COORDS } from '../../hooks/useDiscovery';
+
 const mockGetLocationPermissionStatus = jest.fn();
 const mockRequestLocationPermission = jest.fn();
 const mockGetCurrentLocation = jest.fn();
 const mockUpdateMyLocation = jest.fn();
 
 jest.mock('../../services/geo.service', () => ({
-  getLocationPermissionStatus: (...a: unknown[]) =>
-    mockGetLocationPermissionStatus(...a),
-  requestLocationPermission: (...a: unknown[]) =>
-    mockRequestLocationPermission(...a),
+  getLocationPermissionStatus: (...a: unknown[]) => mockGetLocationPermissionStatus(...a),
+  requestLocationPermission: (...a: unknown[]) => mockRequestLocationPermission(...a),
   getCurrentLocation: (...a: unknown[]) => mockGetCurrentLocation(...a),
   updateMyLocation: (...a: unknown[]) => mockUpdateMyLocation(...a),
 }));
@@ -36,7 +37,7 @@ jest.mock('../../stores/discovery.store', () => ({
 const mockAuthState = { profile: null as null | { userId: string } };
 jest.mock('../../stores/auth.store', () => ({
   useAuthStore: jest.fn((selector?: (s: typeof mockAuthState) => unknown) =>
-    selector ? selector(mockAuthState) : mockAuthState,
+    selector ? selector(mockAuthState) : mockAuthState
   ),
 }));
 
@@ -46,9 +47,6 @@ jest.mock('../../services/firebase', () => ({
   auth: null,
 }));
 
-import { renderHook, waitFor, act } from '@testing-library/react-native';
-import { useDiscovery, DEFAULT_COORDS } from '../../hooks/useDiscovery';
-
 beforeEach(() => {
   jest.clearAllMocks();
   mockAuthState.profile = null;
@@ -57,9 +55,16 @@ beforeEach(() => {
 // ─── INITIAL STATE ──────────────────────────────────────────────────────────
 
 describe('useDiscovery — initial state', () => {
-  it('starts on the Warsaw fallback', () => {
+  it('starts on the Warsaw fallback', async () => {
     mockGetLocationPermissionStatus.mockResolvedValue('denied');
     const { result } = renderHook(() => useDiscovery());
+
+    // Wait for the on-mount async effect to settle so we don't trip the
+    // "update not wrapped in act()" warning. State should still be the
+    // fallback because permission resolves to 'denied'.
+    await waitFor(() => {
+      expect(result.current.permissionStatus).toBe('denied');
+    });
 
     expect(result.current.coords).toEqual(DEFAULT_COORDS);
     expect(result.current.usingFallbackCoords).toBe(true);
@@ -142,9 +147,6 @@ describe('useDiscovery — fetch coordination', () => {
       await result.current.refresh();
     });
 
-    expect(mockFetchUsers).toHaveBeenCalledWith(
-      DEFAULT_COORDS.lat,
-      DEFAULT_COORDS.lon,
-    );
+    expect(mockFetchUsers).toHaveBeenCalledWith(DEFAULT_COORDS.lat, DEFAULT_COORDS.lon);
   });
 });

@@ -12,12 +12,7 @@ const EARTH_RADIUS_KM = 6371;
  *
  * @returns distance in kilometers
  */
-export function haversineDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-): number {
+export function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const toRad = (deg: number) => (deg * Math.PI) / 180;
 
   const dLat = toRad(lat2 - lat1);
@@ -41,11 +36,7 @@ const BASE32 = '0123456789bcdefghjkmnpqrstuvwxyz';
  * Default precision of 9 gives ~5 m accuracy — good enough for city-level
  * proximity queries via GeoFirestore.
  */
-export function encodeGeohash(
-  lat: number,
-  lon: number,
-  precision: number = 9,
-): string {
+export function encodeGeohash(lat: number, lon: number, precision: number = 9): string {
   let latMin = -90;
   let latMax = 90;
   let lonMin = -180;
@@ -96,14 +87,9 @@ export interface IBoundingBox {
  * Calculate a bounding box around a center point given a radius in km.
  * Useful for pre-filtering users before applying Haversine.
  */
-export function boundingBox(
-  lat: number,
-  lon: number,
-  radiusKm: number,
-): IBoundingBox {
-  const latDelta = radiusKm / EARTH_RADIUS_KM * (180 / Math.PI);
-  const lonDelta =
-    latDelta / Math.cos((lat * Math.PI) / 180);
+export function boundingBox(lat: number, lon: number, radiusKm: number): IBoundingBox {
+  const latDelta = (radiusKm / EARTH_RADIUS_KM) * (180 / Math.PI);
+  const lonDelta = latDelta / Math.cos((lat * Math.PI) / 180);
 
   return {
     minLat: lat - latDelta,
@@ -144,7 +130,7 @@ export function isWithinRadius(
   centerLon: number,
   pointLat: number,
   pointLon: number,
-  radiusKm: number,
+  radiusKm: number
 ): boolean {
   return haversineDistance(centerLat, centerLon, pointLat, pointLon) <= radiusKm;
 }

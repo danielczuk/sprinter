@@ -2,6 +2,11 @@
 
 // ─── MOCKS ───────────────────────────────────────────────────────────────────
 
+import type { User as FirebaseUser } from 'firebase/auth';
+
+import { useAuthStore } from '../../stores/auth.store';
+import type { IUser } from '../../types';
+
 const mockOnAuthStateChanged = jest.fn();
 const mockSignInWithCredential = jest.fn();
 const mockSignOut = jest.fn();
@@ -27,17 +32,18 @@ jest.mock('../../services/users.service', () => ({
   updateUser: (...args: unknown[]) => mockUpdateUser(...args),
 }));
 
-import { useAuthStore } from '../../stores/auth.store';
-
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
-const fakeFirebaseUser = { uid: 'user1', email: 'test@test.com' };
+const fakeFirebaseUser = {
+  uid: 'user1',
+  email: 'test@test.com',
+} as unknown as FirebaseUser;
 const fakeProfile = {
   userId: 'user1',
   name: 'Jan Kowalski',
   sport: 'running',
   level: 'intermediate',
-};
+} as unknown as IUser;
 
 function resetStore() {
   useAuthStore.setState({
@@ -136,8 +142,8 @@ describe('auth.store — initialize', () => {
 describe('auth.store — signOut', () => {
   it('clears user and profile on success', async () => {
     useAuthStore.setState({
-      firebaseUser: fakeFirebaseUser as any,
-      profile: fakeProfile as any,
+      firebaseUser: fakeFirebaseUser,
+      profile: fakeProfile,
     });
     mockSignOut.mockResolvedValue(undefined);
 
@@ -161,7 +167,7 @@ describe('auth.store — signOut', () => {
 
 describe('auth.store — refreshProfile', () => {
   it('reloads profile from Firestore', async () => {
-    useAuthStore.setState({ firebaseUser: fakeFirebaseUser as any });
+    useAuthStore.setState({ firebaseUser: fakeFirebaseUser });
     mockGetUser.mockResolvedValue({ ...fakeProfile, name: 'Updated Name' });
 
     await useAuthStore.getState().refreshProfile();
@@ -181,13 +187,13 @@ describe('auth.store — refreshProfile', () => {
 describe('auth.store — updateProfile', () => {
   it('updates existing profile', async () => {
     useAuthStore.setState({
-      firebaseUser: fakeFirebaseUser as any,
-      profile: fakeProfile as any,
+      firebaseUser: fakeFirebaseUser,
+      profile: fakeProfile,
     });
     mockUpdateUser.mockResolvedValue(undefined);
     mockGetUser.mockResolvedValue({ ...fakeProfile, bio: 'Nowe bio' });
 
-    await useAuthStore.getState().updateProfile({ bio: 'Nowe bio' } as any);
+    await useAuthStore.getState().updateProfile({ bio: 'Nowe bio' });
 
     expect(mockUpdateUser).toHaveBeenCalledWith('user1', { bio: 'Nowe bio' });
     expect(useAuthStore.getState().profile?.bio).toBe('Nowe bio');
@@ -195,13 +201,13 @@ describe('auth.store — updateProfile', () => {
 
   it('creates profile when none exists yet', async () => {
     useAuthStore.setState({
-      firebaseUser: fakeFirebaseUser as any,
+      firebaseUser: fakeFirebaseUser,
       profile: null,
     });
     mockCreateUser.mockResolvedValue(undefined);
     mockGetUser.mockResolvedValue(fakeProfile);
 
-    await useAuthStore.getState().updateProfile(fakeProfile as any);
+    await useAuthStore.getState().updateProfile(fakeProfile);
 
     expect(mockCreateUser).toHaveBeenCalledTimes(1);
   });
@@ -209,9 +215,9 @@ describe('auth.store — updateProfile', () => {
   it('throws when not logged in', async () => {
     useAuthStore.setState({ firebaseUser: null });
 
-    await expect(
-      useAuthStore.getState().updateProfile({ bio: 'test' } as any),
-    ).rejects.toThrow('Nie zalogowano');
+    await expect(useAuthStore.getState().updateProfile({ bio: 'test' })).rejects.toThrow(
+      'Nie zalogowano'
+    );
   });
 });
 

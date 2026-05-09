@@ -2,6 +2,15 @@
 
 // ─── MOCKS ───────────────────────────────────────────────────────────────────
 
+import {
+  requestLocationPermission,
+  getLocationPermissionStatus,
+  getCurrentLocation,
+  findNearbyPartners,
+  updateMyLocation,
+  coordsFromGeoPoint,
+} from '../../services/geo.service';
+
 const mockRequestPerm = jest.fn();
 const mockGetPerm = jest.fn();
 const mockGetPosition = jest.fn();
@@ -15,8 +24,7 @@ jest.mock('expo-location', () => ({
   Accuracy: {
     Balanced: 4,
   },
-  requestForegroundPermissionsAsync: (...args: unknown[]) =>
-    mockRequestPerm(...args),
+  requestForegroundPermissionsAsync: (...args: unknown[]) => mockRequestPerm(...args),
   getForegroundPermissionsAsync: (...args: unknown[]) => mockGetPerm(...args),
   getCurrentPositionAsync: (...args: unknown[]) => mockGetPosition(...args),
 }));
@@ -41,23 +49,9 @@ jest.mock('firebase/firestore', () => {
   return { GeoPoint };
 });
 
-import {
-  requestLocationPermission,
-  getLocationPermissionStatus,
-  getCurrentLocation,
-  findNearbyPartners,
-  updateMyLocation,
-  coordsFromGeoPoint,
-} from '../../services/geo.service';
-
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
-function makeUser(
-  id: string,
-  lat: number,
-  lon: number,
-  overrides: Record<string, unknown> = {},
-) {
+function makeUser(id: string, lat: number, lon: number, overrides: Record<string, unknown> = {}) {
   return {
     userId: id,
     name: `User ${id}`,
@@ -207,9 +201,7 @@ describe('updateMyLocation', () => {
     const [userId, geoPoint, geohash] = mockUpdateUserLocation.mock.calls[0];
 
     expect(userId).toBe('user1');
-    expect(geoPoint).toEqual(
-      expect.objectContaining({ latitude: 52.23, longitude: 21.01 }),
-    );
+    expect(geoPoint).toEqual(expect.objectContaining({ latitude: 52.23, longitude: 21.01 }));
     expect(typeof geohash).toBe('string');
     // Warsaw geohash starts with "u3" (u3q-u3r area).
     expect(geohash.startsWith('u3')).toBe(true);
@@ -229,6 +221,6 @@ describe('coordsFromGeoPoint', () => {
   it('returns null on null/undefined or malformed input', () => {
     expect(coordsFromGeoPoint(null)).toBeNull();
     expect(coordsFromGeoPoint(undefined)).toBeNull();
-    expect(coordsFromGeoPoint({ latitude: 'no', longitude: 0 } as any)).toBeNull();
+    expect(coordsFromGeoPoint({ latitude: 'no' as unknown as number, longitude: 0 })).toBeNull();
   });
 });

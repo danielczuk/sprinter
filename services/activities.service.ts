@@ -52,15 +52,15 @@ export async function getUserActivities(userId: string): Promise<IActivity[]> {
       query(
         collection(db, ACTIVITIES_COLLECTION),
         where('initiatorId', '==', userId),
-        orderBy('createdAt', 'desc'),
-      ),
+        orderBy('createdAt', 'desc')
+      )
     ),
     getDocs(
       query(
         collection(db, ACTIVITIES_COLLECTION),
         where('partnerId', '==', userId),
-        orderBy('createdAt', 'desc'),
-      ),
+        orderBy('createdAt', 'desc')
+      )
     ),
   ]);
 
@@ -75,9 +75,7 @@ export async function getUserActivities(userId: string): Promise<IActivity[]> {
   }
 
   // Sort merged results by createdAt descending
-  return results.sort(
-    (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis(),
-  );
+  return results.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
 }
 
 /**
@@ -85,7 +83,7 @@ export async function getUserActivities(userId: string): Promise<IActivity[]> {
  */
 export async function getUserActivitiesByStatus(
   userId: string,
-  status: ActivityStatus,
+  status: ActivityStatus
 ): Promise<IActivity[]> {
   const all = await getUserActivities(userId);
   return all.filter((a) => a.status === status);
@@ -121,7 +119,7 @@ export async function createActivity(data: IActivityCreate): Promise<string> {
  */
 export async function updateActivityStatus(
   activityId: string,
-  status: ActivityStatus,
+  status: ActivityStatus
 ): Promise<void> {
   if (!db) throw new Error('Firebase not configured');
   const ref = doc(db, ACTIVITIES_COLLECTION, activityId);
@@ -137,7 +135,7 @@ export async function updateActivityStatus(
  */
 export async function updateActivityConditions(
   activityId: string,
-  conditions: Partial<IActivity['conditions']>,
+  conditions: Partial<IActivity['conditions']>
 ): Promise<void> {
   if (!db) throw new Error('Firebase not configured');
   const ref = doc(db, ACTIVITIES_COLLECTION, activityId);
@@ -152,10 +150,7 @@ export async function updateActivityConditions(
  * Record that a user confirms the activity is completed.
  * When both participants confirm, the Cloud Function sets chatUnlocked = true.
  */
-export async function confirmActivityCompleted(
-  activityId: string,
-  userId: string,
-): Promise<void> {
+export async function confirmActivityCompleted(activityId: string, userId: string): Promise<void> {
   if (!db) throw new Error('Firebase not configured');
   const ref = doc(db, ACTIVITIES_COLLECTION, activityId);
 

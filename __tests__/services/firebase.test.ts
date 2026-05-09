@@ -1,5 +1,10 @@
 // __tests__/services/firebase.test.ts
 // Tests for Firebase initialization — both configured and unconfigured states.
+//
+// We use require() rather than import here because each test resets modules
+// (jest.resetModules) and reloads firebase.ts under a different process.env.
+// import-based hoisting would not see the env mutations.
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 jest.mock('firebase/app', () => ({
   initializeApp: jest.fn(() => ({ name: '[DEFAULT]' })),

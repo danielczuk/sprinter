@@ -54,7 +54,7 @@ describe('encodeGeohash', () => {
 
   it('nearby points share a geohash prefix', () => {
     const hash1 = encodeGeohash(52.2297, 21.0122, 7);
-    const hash2 = encodeGeohash(52.2300, 21.0125, 7);
+    const hash2 = encodeGeohash(52.23, 21.0125, 7);
     // Points ~30m apart should share at least 6 chars
     expect(hash1.substring(0, 6)).toBe(hash2.substring(0, 6));
   });
@@ -82,9 +82,7 @@ describe('boundingBox', () => {
     const small = boundingBox(52.2297, 21.0122, 5);
     const large = boundingBox(52.2297, 21.0122, 20);
 
-    expect(large.maxLat - large.minLat).toBeGreaterThan(
-      small.maxLat - small.minLat,
-    );
+    expect(large.maxLat - large.minLat).toBeGreaterThan(small.maxLat - small.minLat);
   });
 
   it('10km box spans roughly 0.18° latitude', () => {
@@ -92,7 +90,7 @@ describe('boundingBox', () => {
     const latSpan = box.maxLat - box.minLat;
     // 10 km ≈ 0.09° each side → ~0.18° total
     expect(latSpan).toBeGreaterThan(0.15);
-    expect(latSpan).toBeLessThan(0.20);
+    expect(latSpan).toBeLessThan(0.2);
   });
 });
 

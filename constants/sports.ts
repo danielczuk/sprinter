@@ -81,11 +81,7 @@ export const LEVELS: Record<LevelType, ILevelConfig> = {
   },
 };
 
-export const LEVEL_LIST: ILevelConfig[] = [
-  LEVELS.beginner,
-  LEVELS.intermediate,
-  LEVELS.advanced,
-];
+export const LEVEL_LIST: ILevelConfig[] = [LEVELS.beginner, LEVELS.intermediate, LEVELS.advanced];
 
 // ─── LIMITS ──────────────────────────────────────────────────────────────────
 

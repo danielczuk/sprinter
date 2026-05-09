@@ -10,11 +10,7 @@ import * as Location from 'expo-location';
 import { GeoPoint } from 'firebase/firestore';
 
 import { getUsersBySport, updateUserLocation } from '@/services/users.service';
-import {
-  haversineDistance,
-  encodeGeohash,
-  boundingBox,
-} from '@/utils/geo.utils';
+import { haversineDistance, encodeGeohash, boundingBox } from '@/utils/geo.utils';
 import { IUser, IUserWithDistance, SportType } from '@/types';
 
 // ─── COORDINATES ─────────────────────────────────────────────────────────────
@@ -102,7 +98,7 @@ export interface IFindNearbyOptions {
 export async function findNearbyPartners(
   currentLat: number,
   currentLon: number,
-  options: IFindNearbyOptions,
+  options: IFindNearbyOptions
 ): Promise<IUserWithDistance[]> {
   const { sport, radiusKm, excludeIds = [] } = options;
 
@@ -139,10 +135,7 @@ export async function findNearbyPartners(
  * Geohash is computed locally from lat/lon — saves a round trip and keeps
  * the encoding deterministic (same lat/lon always produces the same hash).
  */
-export async function updateMyLocation(
-  userId: string,
-  coords: ICoords,
-): Promise<void> {
+export async function updateMyLocation(userId: string, coords: ICoords): Promise<void> {
   const geohash = encodeGeohash(coords.lat, coords.lon);
   const geoPoint = new GeoPoint(coords.lat, coords.lon);
   await updateUserLocation(userId, geoPoint, geohash);
@@ -155,7 +148,7 @@ export async function updateMyLocation(
  * object exposing `latitude`/`longitude`. Returns null if the input is invalid.
  */
 export function coordsFromGeoPoint(
-  geo: { latitude?: number; longitude?: number } | null | undefined,
+  geo: { latitude?: number; longitude?: number } | null | undefined
 ): ICoords | null {
   if (!geo || typeof geo.latitude !== 'number' || typeof geo.longitude !== 'number') {
     return null;

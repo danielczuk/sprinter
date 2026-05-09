@@ -24,9 +24,7 @@ export default function ProfileScreen() {
       <View style={styles.card}>
         {/* Avatar placeholder — no profile photos in MVP */}
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {profile?.name?.charAt(0)?.toUpperCase() ?? '?'}
-          </Text>
+          <Text style={styles.avatarText}>{profile?.name?.charAt(0)?.toUpperCase() ?? '?'}</Text>
         </View>
 
         <Text style={styles.name}>{profile?.name ?? 'Nowy użytkownik'}</Text>

@@ -15,22 +15,22 @@ export type ActivityStatus = 'proposed' | 'confirmed' | 'completed' | 'cancelled
 // ─── USER ─────────────────────────────────────────────────────────────────────
 
 export interface IUserStats {
-  avgPace?: string;     // Np. "5:20" — tylko dla running/cycling
-  weeklyKm?: number;   // Tygodniowy przebieg w km
+  avgPace?: string; // Np. "5:20" — tylko dla running/cycling
+  weeklyKm?: number; // Tygodniowy przebieg w km
   activeDays?: number; // Ile dni w tygodniu trenuje
 }
 
 export interface IUser {
-  userId: string;      // UID z Firebase Auth — klucz główny
-  name: string;        // Pełne imię i nazwisko
+  userId: string; // UID z Firebase Auth — klucz główny
+  name: string; // Pełne imię i nazwisko
   sport: SportType;
   level: LevelType;
-  location: GeoPoint;  // Aktualna pozycja GPS
-  geohash: string;     // Zakodowana lokalizacja do GeoFirestore queries
-  bio: string;         // Max 160 znaków
+  location: GeoPoint; // Aktualna pozycja GPS
+  geohash: string; // Zakodowana lokalizacja do GeoFirestore queries
+  bio: string; // Max 160 znaków
   stats: IUserStats;
   lastActive: Timestamp;
-  blocked: string[];   // Lista zablokowanych userId
+  blocked: string[]; // Lista zablokowanych userId
   createdAt: Timestamp;
 }
 
@@ -43,12 +43,12 @@ export interface IActivityConditions {
   dateTime: Timestamp;
   locationName: string;
   locationGeo: GeoPoint;
-  pace?: string;        // Np. "5:00" — running/cycling
-  speed?: number;       // km/h — cycling
-  distance?: number;    // km — running/cycling
-  duration?: number;    // minuty — gym/tennis/climbing
-  climbGrade?: string;  // Np. "6c" — climbing
-  matchType?: string;   // Np. "Treningowa" — tennis
+  pace?: string; // Np. "5:00" — running/cycling
+  speed?: number; // km/h — cycling
+  distance?: number; // km — running/cycling
+  duration?: number; // minuty — gym/tennis/climbing
+  climbGrade?: string; // Np. "6c" — climbing
+  matchType?: string; // Np. "Treningowa" — tennis
   workoutType?: string; // Np. "Full body" — gym
 }
 
@@ -56,8 +56,8 @@ export interface IActivityConditions {
 
 export interface IActivity {
   activityId: string;
-  initiatorId: string;   // FK → users
-  partnerId: string;     // FK → users
+  initiatorId: string; // FK → users
+  partnerId: string; // FK → users
   sport: SportType;
   status: ActivityStatus;
   conditions: IActivityConditions;
@@ -76,10 +76,10 @@ export type IActivityCreate = Omit<
 
 export interface IMessage {
   messageId: string;
-  senderId: string;  // FK → users
-  text: string;      // Max 1000 znaków
+  senderId: string; // FK → users
+  text: string; // Max 1000 znaków
   sentAt: Timestamp; // serverTimestamp()
-  readBy: string[];  // userId którzy przeczytali
+  readBy: string[]; // userId którzy przeczytali
 }
 
 export type IMessageCreate = Omit<IMessage, 'messageId' | 'sentAt' | 'readBy'>;

@@ -21,23 +21,15 @@ export default function LoginScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.hero}>
         <Text style={styles.logo}>Sprinter</Text>
-        <Text style={styles.tagline}>
-          Aktywność najpierw,{'\n'}znajomość potem.
-        </Text>
+        <Text style={styles.tagline}>Aktywność najpierw,{'\n'}znajomość potem.</Text>
       </View>
 
       <View style={styles.actions}>
-        <Pressable
-          style={[styles.button, styles.googleButton]}
-          onPress={handleGoogleSignIn}
-        >
+        <Pressable style={[styles.button, styles.googleButton]} onPress={handleGoogleSignIn}>
           <Text style={styles.googleButtonText}>Kontynuuj z Google</Text>
         </Pressable>
 
-        <Pressable
-          style={[styles.button, styles.appleButton]}
-          onPress={handleAppleSignIn}
-        >
+        <Pressable style={[styles.button, styles.appleButton]} onPress={handleAppleSignIn}>
           <Text style={styles.appleButtonText}>Kontynuuj z Apple</Text>
         </Pressable>
 
