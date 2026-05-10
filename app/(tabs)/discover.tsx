@@ -3,14 +3,24 @@
 // Shows filterable feed of UserCards driven by the useDiscovery hook.
 
 import React, { useCallback } from 'react';
-import { View, Text, FlatList, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  ActivityIndicator,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
 import { useDiscovery } from '@/hooks/useDiscovery';
-import { SPORT_LIST } from '@/constants/sports';
+import { SPORTS, SPORT_LIST } from '@/constants/sports';
 import { COLORS, FONT_SIZE, SPACING, RADIUS, LAYOUT } from '@/constants/theme';
 import UserCard from '@/components/ui/UserCard';
 import { IUserWithDistance, SportType } from '@/types';
 
 export default function DiscoverScreen() {
+  const router = useRouter();
   const {
     users,
     filters,
@@ -23,10 +33,31 @@ export default function DiscoverScreen() {
     requestPermission,
   } = useDiscovery();
 
-  const handleUserPress = useCallback((_user: IUserWithDistance) => {
-    // TODO: Navigate to activity proposal / negotiation screen
-    // router.push(`/activity/negotiate?partnerId=${_user.userId}`);
-  }, []);
+  const handleUserPress = useCallback(
+    (user: IUserWithDistance) => {
+      // Only running has the negotiate flow built so far. Other sports
+      // still appear in discovery but route nowhere yet — confirm to the
+      // user that we know it's missing.
+      if (user.sport !== 'running') {
+        Alert.alert(
+          'Wkrótce',
+          `Negocjacja dla dyscypliny "${SPORTS[user.sport].label}" jeszcze nie jest gotowa. Na razie umawiamy tylko biegania.`,
+          [{ text: 'OK', style: 'default' }]
+        );
+        return;
+      }
+
+      router.push({
+        pathname: '/activity/negotiate',
+        params: {
+          partnerId: user.userId,
+          partnerName: user.name,
+          sport: user.sport,
+        },
+      });
+    },
+    [router]
+  );
 
   const handleSportFilter = useCallback(
     (sport: SportType) => {
